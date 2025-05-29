@@ -1,5 +1,5 @@
-// server.js
 const express = require("express");
+const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const productRoutes = require("./routes/productRoutes");
@@ -9,6 +9,12 @@ dotenv.config();
 
 // Initialize Express app
 const app = express();
+
+const corsOptions = {
+  origin: "http://localhost:5173",
+  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions));
 
 // Connect to MongoDB
 connectDB();
