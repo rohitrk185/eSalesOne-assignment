@@ -154,6 +154,51 @@ const buyProduct = async (req, res) => {
   }
 };
 
+const getOrderData = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findOne({ orderId })
+      .populate("productId")
+      .populate("variantId")
+      .populate("userId");
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const orderData = {
+      orderId: order.orderId,
+      customerDetails: {
+        name: order.userId.fullName,
+        email: order.userId.email,
+        phoneNumber: order.userId.phoneNumber,
+        address: order.userId.address,
+        city: order.userId.city,
+        state: order.userId.state,
+        zipCode: order.userId.zipCode,
+      },
+      product: {
+        productId: order.productId._id,
+        name: order.productId.title,
+        price: order.productId.price,
+        variant: {
+          name: order.variantId.name,
+          price: order.variantId.price,
+        },
+      },
+      status: order.status,
+      quantity: order.quantity,
+      amount: order.amount,
+      createdAt: order.createdAt,
+    };
+    res.status(200).json(orderData);
+  } catch (error) {
+    console.error("Error fetching order data:", error);
+    res.status(500).json({ message: "Server error while fetching order data" });
+  }
+};
+
 module.exports = {
   buyProduct,
+  getOrderData,
 };
