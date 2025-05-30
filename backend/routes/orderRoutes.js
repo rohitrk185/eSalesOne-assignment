@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { getAllProducts } = require("../controllers/productController");
+const { buyProduct } = require("../controllers/orderController.js");
 const { apiKeyCheck } = require("../middlewares/apiKeyCheck.js");
 
-// Route to get all products
-router.get("/", apiKeyCheck, getAllProducts);
+router.post("/checkout", apiKeyCheck, buyProduct);
 
 module.exports = router;

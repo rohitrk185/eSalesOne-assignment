@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Variant = require("./Variant");
 
 const ratingSchema = new mongoose.Schema(
   {
@@ -52,6 +53,10 @@ const productSchema = new mongoose.Schema(
     quantity: {
       type: Number,
       required: true,
+    },
+    variants: {
+      type: [Variant.schema],
+      default: [],
     },
   },
   {

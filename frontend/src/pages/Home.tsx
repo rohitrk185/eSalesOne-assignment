@@ -18,7 +18,7 @@ function HomePage() {
     );
 
   return (
-    <div className="w-screen p-4">
+    <div className="w-screen p-8 mb-20">
       <h1 className="text-3xl text-center underline mb-6">Products</h1>
 
       <ProductsList products={products} />

@@ -5,7 +5,23 @@ const Product = require("../models/Product");
 // @access  Public
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.aggregate([
+      {
+        $match: {},
+      },
+      {
+        $lookup: {
+          // variants collection
+          from: "variants",
+          // Field in products collection
+          localField: "_id",
+          // Field in variants collection
+          foreignField: "productId",
+          // field to which variants will be added
+          as: "variants",
+        },
+      },
+    ]);
     if (!products || products.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }

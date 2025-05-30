@@ -3,6 +3,15 @@ interface Rating {
   count: number;
 }
 
+export interface Variant {
+  _id: string;
+  name: string;
+  price?: number;
+  quantity: number;
+  productId: string;
+  image?: string;
+}
+
 export interface Product {
   _id: string;
   id: number;
@@ -14,4 +23,5 @@ export interface Product {
   image: string;
   rating: Rating;
   quantity: number;
+  variants: Variant[];
 }
