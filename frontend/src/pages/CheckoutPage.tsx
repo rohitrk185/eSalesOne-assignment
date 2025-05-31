@@ -5,13 +5,15 @@ import {
   type CheckoutRequest,
 } from "../types/order";
 import { requestCheckout } from "../api/checkout";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
+import { ProductsContext } from "../contexts/ProductsContext";
 
 function CheckoutPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const item = location.state?.item as CheckoutItem | undefined;
 
+  const { updateProductCount } = useContext(ProductsContext);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const checkoutFormRef = useRef<HTMLFormElement>(null);
@@ -49,7 +51,7 @@ function CheckoutPage() {
     const userCity = formData.get("city") as string;
     const userState = formData.get("state") as string;
     const userPincode = formData.get("zip") as string;
-    const cardNumber = formData.get("cardNumber") as string;
+    const cardNumber = (formData.get("cardNumber") as string).replace(/ /g, "");
     const expiryDate = formData.get("expiryDate") as string;
     const cvv = formData.get("cvv") as string;
 
@@ -74,6 +76,7 @@ function CheckoutPage() {
 
     if (!cardNumber.trim()) errors.cardNumber = "Card Number is required.";
     else if (!/^[0-9]{16}$/.test(cardNumber)) {
+      // console.log("cardNumber: ", cardNumber);
       errors.cardNumber = "Card Number must be 16 digits.";
     }
 
@@ -113,10 +116,13 @@ function CheckoutPage() {
     }
 
     const res = await requestCheckout(data);
-    console.log("res: ", res);
+    // console.log("res: ", res);
 
     if (res.statusCode === 201) {
-      navigate(`/checkout/${res.data.orderId}`);
+      updateProductCount(item.productId, item.variantId, -item.quantity);
+      navigate(`/checkout/${res.data.orderId}`, {
+        replace: true,
+      });
     } else {
       const message =
         res.data &&

@@ -11,12 +11,18 @@ interface ProductsContextType {
   products: Product[];
   loading: boolean;
   error: string | null;
+  updateProductCount: (
+    productId: string,
+    variantId: string | undefined,
+    count: number
+  ) => void;
 }
 
 export const ProductsContext = createContext<ProductsContextType>({
   products: [],
   loading: true,
   error: null,
+  updateProductCount: () => {},
 });
 
 interface ProductsProviderProps {
@@ -50,8 +56,34 @@ export const ProductsProvider: React.FC<ProductsProviderProps> = ({
     fetchProducts();
   }, []);
 
+  const updateProductCount = (
+    productId: string,
+    variantId: string | undefined,
+    count: number
+  ) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) => {
+        if (product._id === productId) {
+          if (!variantId) {
+            return { ...product, quantity: product.quantity + count };
+          }
+          const updatedVariants = product.variants.map((variant) => {
+            if (variant._id === variantId) {
+              return { ...variant, quantity: variant.quantity + count };
+            }
+            return variant;
+          });
+          return { ...product, variants: updatedVariants };
+        }
+        return product;
+      })
+    );
+  };
+
   return (
-    <ProductsContext.Provider value={{ products, loading, error }}>
+    <ProductsContext.Provider
+      value={{ products, loading, error, updateProductCount }}
+    >
       {children}
     </ProductsContext.Provider>
   );
